@@ -30,8 +30,8 @@ public class ProductService {
   }
 
   @Transactional(readOnly = true)
-  public Page<ProductDTO> findaAll(Pageable pageable) {
-    Page<Product> result = repository.findAll(pageable);
+  public Page<ProductDTO> findaAll(String name ,Pageable pageable) {
+    Page<Product> result = repository.searchByName(name, pageable);
     return result.map(x -> new ProductDTO(x));
   }
 
@@ -63,23 +63,16 @@ public class ProductService {
     entity.setPrice(dto.getPrice());
     entity.setImgUrl(dto.getImgUrl());
   }
-/* 
-  @Transactional
-  public void delete(Long id) {
-    repository.deleteById(id);
-  }*/
 
   @Transactional(propagation = Propagation.SUPPORTS)
-public void delete(Long id) {
-	if (!repository.existsById(id)) {
-		throw new ResourceNotFoundException("Recurso não encontrado");
-	}
-	try {
-        	repository.deleteById(id);    		
-	}
-    	catch (DataIntegrityViolationException e) {
-        	throw new DatabaseException("Falha de integridade referencial");
-   	}
-}
-
+  public void delete(Long id) {
+    if (!repository.existsById(id)) {
+      throw new ResourceNotFoundException("Recurso não encontrado");
+    }
+    try {
+      repository.deleteById(id);
+    } catch (DataIntegrityViolationException e) {
+      throw new DatabaseException("Falha de integridade referencial");
+    }
+  }
 }
