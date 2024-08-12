@@ -2,14 +2,13 @@ package com.devsuperior.dscommerce.controllers;
 
 import com.devsuperior.dscommerce.dto.ProductDTO;
 import com.devsuperior.dscommerce.services.ProductService;
-
 import jakarta.validation.Valid;
-
 import java.net.URI;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -29,7 +28,10 @@ public class ProductController {
   private ProductService service;
 
   @GetMapping
-  public ResponseEntity<Page<ProductDTO>> findAll(@RequestParam(name = "name", defaultValue = "") String name, Pageable pageable) {
+  public ResponseEntity<Page<ProductDTO>> findAll(
+    @RequestParam(name = "name", defaultValue = "") String name,
+    Pageable pageable
+  ) {
     Page<ProductDTO> dot = service.findaAll(name, pageable);
     return ResponseEntity.ok(dot);
   }
@@ -40,6 +42,7 @@ public class ProductController {
     return ResponseEntity.ok(dto);
   }
 
+  @PreAuthorize("hasAnyRole('ROLE_ADMIN', 'ROLE_ADMIN')")
   @PostMapping
   public ResponseEntity<ProductDTO> insert(@Valid @RequestBody ProductDTO dto) {
     dto = service.insert(dto);
@@ -51,6 +54,7 @@ public class ProductController {
     return ResponseEntity.created(uri).body(dto);
   }
 
+  @PreAuthorize("hasAnyRole('ROLE_ADMIN', 'ROLE_ADMIN')")
   @PutMapping(value = "/{id}")
   public ResponseEntity<ProductDTO> update(
     @PathVariable Long id,
@@ -60,6 +64,7 @@ public class ProductController {
     return ResponseEntity.ok(dto);
   }
 
+  @PreAuthorize("hasAnyRole('ROLE_ADMIN', 'ROLE_ADMIN')")
   @DeleteMapping(value = "/{id}")
   public ResponseEntity<Void> delete(@PathVariable Long id) {
     service.delete(id);
